@@ -13,20 +13,37 @@
 
         body {
             margin: 0;
+            padding: 0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-x: hidden;
+            background: white;
         }
 
         .container {
             width: 100vw;
             height: 100vh;
-            position: relative;
-            background: white;
-            padding: 40px;
-            border: 1rem solid #68f1a1;
+            border: 80px solid #68f1a1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .content {
+            text-align: center;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        /* Let's try a different mobile approach with viewport units */
+        @media (max-width: 768px) {
+            .container {
+                border-width: 40px;
+            }
+        }
         }
 
         .content {
@@ -126,7 +143,7 @@
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
-                border-width: 20px;
+                border-width: 50px;
             }
         }
     </style>
