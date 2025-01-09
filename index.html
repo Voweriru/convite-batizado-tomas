@@ -12,24 +12,21 @@
         }
 
         body {
+            margin: 0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #f0f8ff;
-            padding: 20px;
             overflow-x: hidden;
         }
 
         .container {
-            width: 100%;
-            max-width: 800px;
-            min-height: 80vh;
+            width: 100vw;
+            height: 100vh;
             position: relative;
             background: white;
             padding: 40px;
-            border: 30px solid transparent;
-            border-image: url('/api/placeholder/100/100') 30 round;
+            border: 1rem solid #68f1a1;
         }
 
         .content {
@@ -99,12 +96,31 @@
             display: none;
         }
 
+        .modal-header {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
         .close-modal {
-            float: right;
+            position: absolute;
+            right: 0;
+            top: 0;
             background: none;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
+        }
+
+        .modal form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-group {
+            width: 100%;
         }
 
         @media (max-width: 600px) {
@@ -118,9 +134,8 @@
 <body>
     <div class="container">
         <div class="content">
-            <!-- Replace this with your invitation text -->
-            <h1>Baptism Invitation</h1>
-            <p>Your invitation text goes here...</p>
+            <p>Venha celebrar o meu batizado</p>
+            <h1>Tomás</h1>
             
             <button class="respond-button">Responder</button>
         </div>
@@ -128,8 +143,10 @@
 
     <div class="modal">
         <div class="modal-content">
-            <button class="close-modal">&times;</button>
-            <h2>Confirmação de Presença</h2>
+            <div class="modal-header">
+                <h2>Confirmação de Presença</h2>
+                <button class="close-modal">&times;</button>
+            </div>
             <form action="https://formspree.io/f/YOUR_FORMSPREE_ENDPOINT" method="POST">
                 <div class="form-group">
                     <label for="name">Nome:</label>
