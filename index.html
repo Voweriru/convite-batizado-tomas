@@ -19,6 +19,7 @@
             width: 100vw;
             height: 100vh;
             border: 80px solid #68f1a1;
+            border-width: 40px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -74,6 +75,26 @@
             position: relative;
             z-index: 2;
         }
+
+        .container::before {
+                top: -40px;
+                right: -40px;
+                bottom: -40px;
+                left: -40px;
+                background-size: 40px;
+                -webkit-mask-size: 100% 40px, 100% 40px, 40px 100%, 40px 100%;
+                mask-size: 100% 40px, 100% 40px, 40px 100%, 40px 100%;
+                -webkit-mask: 
+                    linear-gradient(to right, black 40px, transparent 40px calc(100% - 40px), black calc(100% - 40px)) top,
+                    linear-gradient(to right, black 40px, transparent 40px calc(100% - 40px), black calc(100% - 40px)) bottom,
+                    linear-gradient(to bottom, black 40px, transparent 40px calc(100% - 40px), black calc(100% - 40px)) left,
+                    linear-gradient(to bottom, black 40px, transparent 40px calc(100% - 40px), black calc(100% - 40px)) right;
+                mask: 
+                    linear-gradient(to right, black 40px, transparent 40px calc(100% - 40px), black calc(100% - 40px)) top,
+                    linear-gradient(to right, black 40px, transparent 40px calc(100% - 40px), black calc(100% - 40px)) bottom,
+                    linear-gradient(to bottom, black 40px, transparent 40px calc(100% - 40px), black calc(100% - 40px)) left,
+                    linear-gradient(to bottom, black 40px, transparent 40px calc(100% - 40px), black calc(100% - 40px)) right;
+            }
 
         @media (max-width: 768px) {
             .container {
@@ -187,8 +208,15 @@
         <div class="content">
             <p>Venha celebrar o meu batizado</p>
             <h1>Tomás</h1>
-            
-            <button class="respond-button">Responder</button>
+            <div style="width: 200px; height: 200px;">
+                <img src="images/tomas_card.png" width="100%" style="object-fit: contain; margin-left: 25px;" alt="Tomás">
+            </div>
+            <div style="background-color: #68f1a1; border-radius: 25px;">
+            <p>3 de Abril ás 18h</p>
+            <p>Igreja St Bárbara</p>
+            <p>Após a cerimónia iremos celebrar no Restaurante Pôr-do-Sol</p>
+            </div>
+            <button onclick="document.querySelector('.modal').style.display='flex'">Responder</button>
         </div>
     </div>
 
@@ -201,21 +229,21 @@
             <form action="https://formspree.io/f/xnnnlpdk" method="POST">
                 <div class="form-group">
                     <label for="name">Nome:</label>
-                    <input type="text" id="name" name="name" required>
+                    <input type="text" id="name" name="Nome" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="attendance">Você irá comparecer?</label>
-                    <select id="attendance" name="attendance" required>
+                    <select id="attendance" name="Comparece" required>
                         <option value="">Selecione uma opção</option>
-                        <option value="yes">Sim</option>
-                        <option value="no">Não</option>
+                        <option value="Sim">Sim</option>
+                        <option value="Nao">Não</option>
                     </select>
                 </div>
                 
                 <div class="form-group guests-group">
                     <label for="guests">Quantidade de pessoas no seu grupo:</label>
-                    <input type="number" id="guests" name="guests" min="1" value="1">
+                    <input type="number" id="guests" name="Grupo" min="1" value="1">
                 </div>
                 
                 <button type="submit" class="respond-button">Enviar</button>
@@ -224,55 +252,71 @@
     </div>
 
     <script>
-        const modal = document.querySelector('.modal');
-        const respondButton = document.querySelector('.respond-button');
-        const closeButton = document.querySelector('.close-modal');
-        const attendanceSelect = document.getElementById('attendance');
-        const guestsGroup = document.querySelector('.guests-group');
-        
-        respondButton.addEventListener('click', () => {
-            modal.style.display = 'flex';
-        });
-        
-        closeButton.addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
-        
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
-        
-        attendanceSelect.addEventListener('change', (e) => {
-            if (e.target.value === 'yes') {
-                guestsGroup.style.display = 'block';
-            } else {
-                guestsGroup.style.display = 'none';
-            }
+        document.getElementById('attendance').addEventListener('change', function() {
+            document.querySelector('.guests-group').style.display = 
+                this.value === 'Sim' ? 'block' : 'none';
         });
 
-        // Form submission handling
-        const form = document.querySelector('form');
-        form.addEventListener('submit', async (e) => {
+        document.querySelector('form').addEventListener('submit', async function(e) {
             e.preventDefault();
             try {
-                const response = await fetch(form.action, {
+                const response = await fetch(this.action, {
                     method: 'POST',
-                    body: new FormData(form),
+                    body: new FormData(this),
                     headers: {
                         'Accept': 'application/json'
                     }
                 });
                 
-                if (response.ok) {
+                // Log the response for debugging
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
+                // Formspree might return 302 instead of 200, let's accept both
+                if ((response.ok || response.status === 302) && document.getElementById('attendance').value === 'Sim') {
+                    const successModal = document.createElement('div');
+                    successModal.className = 'modal success-modal';
+                    successModal.style.display = 'flex';
+                    successModal.onclick = function(e) {
+                        if (e.target === this) {
+                            clearInterval(window.imageInterval);
+                            this.remove();
+                        }
+                    };
+                    successModal.innerHTML = `
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2>Resposta Enviada!</h2>
+                                <button class="close-modal" onclick="clearInterval(window.imageInterval); this.closest('.modal').remove()">&times;</button>
+                            </div>
+                            <div style="text-align: center;">
+                                <img id="toggleImage" src="images/tomas_gif_1.png" style="width: 100px; height: 100px; margin: 20px 0;">
+                                <p>Obrigado por confirmar sua presença!</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(successModal);
+                    document.querySelector('.modal').style.display = 'none';
+                    this.reset();
+
+                    const images = ["images/tomas_gif_1.png", "images/tomas_gif_2.png"];
+                    let currentIndex = 0;
+                    const imgElement = successModal.querySelector('#toggleImage');
+                    
+                    window.imageInterval = setInterval(() => {
+                        currentIndex = (currentIndex + 1) % 2;
+                        imgElement.src = images[currentIndex];
+                    }, 1000);
+                } else if (response.ok || response.status === 302) {
                     alert('Resposta enviada com sucesso!');
-                    modal.style.display = 'none';
-                    form.reset();
+                    document.querySelector('.modal').style.display = 'none';
+                    this.reset();
                 } else {
-                    throw new Error('Erro ao enviar');
+                    throw new Error(`Erro ao enviar. Status: ${response.status}`);
                 }
             } catch (error) {
+                console.error('Error details:', error);
                 alert('Erro ao enviar sua resposta. Por favor, tente novamente.');
             }
         });
